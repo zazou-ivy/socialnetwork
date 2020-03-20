@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>Social Network (PHP Course))</title>
   <meta charset="UTF-8">
@@ -11,9 +12,10 @@
   <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="css/style.css?<?php echo date('l jS \of F Y h:i:s A'); ?>">
 </head>
+
 <body>
   <header class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" >
+    <a class="navbar-brand">
       <img src="img/icon.png" width="30" height="30" class="d-inline-block align-top" alt="">
       Tiny Social Network
     </a>
@@ -31,78 +33,75 @@
   </header>
 
   <div class="container">
-      <div class="row">
-        <div class="col">
-          <h1 class="display-4">KEEP CALM & LOVE FOXES</h1>
-          <blockquote class="blockquote text-center">
-            <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-            <footer class="blockquote-footer">Maybe someone famous from <cite>Internet</cite></footer>
-          </blockquote>
-        </div>
+    <div class="row">
+      <div class="col">
+        <h1 class="display-4">KEEP CALM & LOVE FOXES</h1>
+        <blockquote class="blockquote text-center">
+          <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+          <footer class="blockquote-footer">Maybe someone famous from <cite>Internet</cite></footer>
+        </blockquote>
       </div>
-      <div class="row">
-        <div class="col">
+    </div>
+    <div class="row">
+      <div class="col">
         <?php
-          if (isset($posts))
-          {
-            foreach ($posts as $onePost)
-            {
+        if (isset($posts)) {
+          foreach ($posts as $onePost) {
         ?>
             <div class="panel panel-white post panel-shadow">
-                  <div class="post-heading">
-                      <div class="pull-left image">
-                          <img src="img/avatars/default.png" class="rounded-circle img-thumbnail avatar" alt="<?=$onePost['user_id'];?>">
-                      </div>
-                      <div class="pull-left meta">
-                          <div class="title h5">
-                              <a href="#"><b><?=$onePost['nickname'];?></b></a>
-                          </div>
-                          <h6 class="text-muted time"><?=$onePost['created_at'];?></h6>
-                      </div>
+              <div class="post-heading">
+                <div class="pull-left image">
+                  <img src="img/avatars/default.png" class="rounded-circle img-thumbnail avatar" alt="<?= $onePost['user_id']; ?>">
+                </div>
+                <div class="pull-left meta">
+                  <div class="title h5">
+                    <a href="#"><b><?= $onePost['nickname']; ?></b></a>
                   </div>
-                  <div class="post-description">
-                      <p><?=$onePost['content'];?></p>
-                  </div>
-                  <div class="post-footer">
-                      <div class="input-group">
-                          <input class="form-control" placeholder="Add a comment" type="text">
-                          <span class="input-group-text">
-                              <a href="#"><i class="fa fa-edit"></i></a>
-                          </span>
-                      </div>
-                      <ul class="comments-list">
-                        <?php
-                          $postId = $onePost['id'];
-                          if (isset($comments[$postId]))
-                          {
-                            foreach ($comments[$postId] as $comment)
-                            {
-                        ?>
-                            <li class="comment">
-                                <a class="pull-left" href="#">
-                                    <img class="avatar" src="img/avatars/default.png">
-                                </a>
-                                <div class="comment-body">
-                                    <div class="comment-heading">
-                                        <h4 class="user"><?=$comment['nickname']; ?></h4>
-                                        <h5 class="time"><?=$comment['created_at']; ?></h5>
-                                    </div>
-                                    <p><?=$comment['content']; ?></p>
-                                </div>
-                            </li>
-                        <?php
-                            }
-                          }
-                        ?>
-                      </ul>
-                  </div>
+                  <h6 class="text-muted time"><?= $onePost['created_at']; ?></h6>
+                </div>
               </div>
-          <?php
-              }
-            }
-          ?>
-          </div>
-        </div>
+              <div class="post-description">
+                <p><?= $onePost['content']; ?></p>
+              </div>
+              <div class="post-footer">
+                <div class="input-group">
+                  <input class="form-control" placeholder="Add a comment" type="text">
+                  <span class="input-group-text">
+                    <a href="#"><i class="fa fa-edit"></i></a>
+                  </span>
+                </div>
+                <ul class="comments-list">
+                  <?php
+                  $postId = $onePost['id'];
+                  if (isset($comments[$postId])) {
+                    foreach ($comments[$postId] as $comment) {
+                  ?>
+                      <li class="comment">
+                        <a class="pull-left" href="#">
+                          <img class="avatar" src="img/avatars/default.png">
+                        </a>
+                        <div class="comment-body">
+                          <div class="comment-heading">
+                            <h4 class="user"><?= $comment['nickname']; ?></h4>
+                            <h5 class="time"><?= $comment['created_at']; ?></h5>
+                          </div>
+                          <p><?= $comment['content']; ?></p>
+                        </div>
+                      </li>
+                  <?php
+                    }
+                  }
+                  ?>
+                </ul>
+              </div>
+            </div>
+        <?php
+          }
+        }
+        ?>
       </div>
-    </body>
+    </div>
+  </div>
+</body>
+
 </html>

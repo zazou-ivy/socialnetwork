@@ -1,3 +1,2 @@
 <?php
-  include "../controllers/controller.php";
-?>
+include "../controllers/controller.php";

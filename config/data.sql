@@ -1,3 +1,5 @@
+USE tsn;
+
 DELETE FROM `user`;
 ALTER TABLE `user` AUTO_INCREMENT = 1;
 
