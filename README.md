@@ -60,14 +60,28 @@ Else you need to install the missing parts.
 
 **MySQL server**:
 
+Installation
+
 ```sh
 sudo apt-get install mysql-server
 ```
 
-If the secure installation utility does not launch automatically after the installation completes, enter the following command:
+Start MySQL server
 
 ```sh
-sudo mysql_secure_installation utility`
+sudo systemctl start mysql
+```
+
+Create a new  MySQL user.
+Of course, you can change the queries to replace **dbuser** & **1234Soleil!** with your own **username** & **password**, just don't forget what you enter because you will need them after.
+
+```sh
+sudo mysql
+```
+```sql
+CREATE USER 'dbuser'@'localhost' IDENTIFIED BY '1234Soleil!';
+GRANT ALL PRIVILEGES ON * . * TO 'dbuser'@'localhost';
+EXIT;
 ```
 
 **Apache2 server**:
@@ -76,11 +90,10 @@ sudo mysql_secure_installation utility`
 sudo apt-get install apache2
 ```
 
-And start them:
+Start the server:
 
 ```sh
 sudo systemctl start apache2
-sudo systemctl start mysqld
 ```
 
 ### Installing
@@ -94,29 +107,32 @@ sudo systemctl start mysqld
 
 - Create an populate the database:
 
-  Go into the **config directory** and run the <u>2 SQL scripts</u> (replace **dbuser** by the right user)
+  Go into the **config directory** and run the <u>2 SQL scripts</u> (replace **dbuser** by the user you entered before)
 
   ```sh
   cd socialnetwork/config
-  mysql -u <dbuser> -p < structure.sql
-  mysql -u <dbuser> -p < data.sql
+  mysql -u dbuser -p < structure.sql
+  mysql -u dbuser -p < data.sql
   ```
 
   - You can connect to the database **tsn** to see if the database and the table were well created
 
     ```sh
-    mysql -u root -p
-    > use tsn;
-    > show tables;
-    > select * from user;
+    sudo mysql
+    ```
+    ```sql
+    use tsn;
+    show tables;
+    select * from user;
+    exit;
     ```
 
-- Go into the **models directory** and modify **PDO.php** to set the right credentials.
+- Go into the **models directory** and modify **PDO.php** to set the right credentials (**$db_user** & **$db_passwd**).
 
 ```php
 <?php
-  $db_user = "root";
-  $db_passwd = "toor";
+  $db_user = "dbuser";
+  $db_passwd = "1234Soleil!";
   $db_host = "localhost";
   $db_port = "3306";
   $db_name = "tsn";
@@ -155,15 +171,17 @@ And follow the execution to understand the whole project.
 Never work on the **master** branch, so start to create a **develop** branch from master and push it to GitHub.
 
 ```sh
-git checkout -b develop
-git push -u origin develop
+git branch develop
+git checkout develop
+git push origin develop
 ```
 
 As you will work on the feature to retrieve comments, create a new branch **feature/retrieveComments** from develop and push it to GitHub.
 
 ```sh
-git checkout -b feature/retrieveComments
-git push -u origin feature/retrieveComments
+git branch feature/retrieveComments
+git checkout feature/retrieveComments
+git push origin feature/retrieveComments
 ```
 
 Now you are ready to code.
@@ -196,22 +214,30 @@ case 'display':
 ```
 <u>You have to:</u>
 
-1.  Go into *models/**CommentManager.php*** to create a new function who get all comments from a post id. Don't forget you need the nickname of the user who commented.
+1.  Go into *models/**CommentManager.php*** to create a new function **GetAllCommentsFromPostId**. This new function should return **all comments** from a **post id**. <u>Don't forget you need the nickname of the user who commented</u>. To do that, have a look to the **GetAllCommentsFromUserId**. Your new function do almost the same thing but instead of "WHERE comment.**user_id = $userId** " you should have "WHERE comment.**post_id = $postId** ".
 
-   ```php
+```php
    function GetAllCommentsFromPostId($postId) {
 	// Code here...
    }
+```
+
+2. Inside *controllers/**controller.php*** remove the *hardcoded part* but keep **$comments = array()**.
+
+3. Instead, loop over **$posts** and call your new function **GetAllCommentsFromPostId** <u>for each post</u> giving the **post id**.
+
+4. Inside the loop, fill the **$comments** array with the results. **$comments** is an associative array, the "key" should be the **post id** and the "value" the result of your new function **GetAllCommentsFromPostId**.
+
+### 4 - Save on GitHub
+
+When all is ok, **commit your changes** and **push** your work to GitHub.
+
+You can **merge your feature branch into develop** and **push** develop too !!!
+
+   ```sh
+git commit -a -m "Remove the hardcoded comments"
+git push origin feature/retrieveComments
+git checkout develop
+git merge feature/retrieveComments
+git push origin develop
    ```
-
-2. Inside *controllers/**controller.php*** remove the *hardcoded part*.
-
-3. Instead, loop over **$posts** and call your new function **GetAllCommentsFromPostId** <u>for each post</u> giving the post id.
-
-4. Fill the **$comments** array with the results. The key is the id of the post and the value the result of your function.
-
-### 4 - Test and Save
-
-When all is ok, **commit your changes** and **push** your branch to GitHub.
-
-You can **merge your feature branch into develop** and **push** develop !!!
