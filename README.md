@@ -94,7 +94,7 @@ sudo systemctl start mysqld
 
 - Create an populate the database:
 
-  Go into the **config directory** and run the <u>2 SQL scripts</u> (replace **dbuser** by the right user)
+  Go into the **config directory** and run the <u>2 SQL scripts</u> (replace **<dbuser>** by the right user)
 
   ```sh
   cd socialnetwork/config
