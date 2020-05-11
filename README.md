@@ -678,7 +678,7 @@ git push origin develop
 
 ## Exercise 6
 
-**<u>Final Goal:</u> Made a simple registration form.**
+**<u>Final Goal:</u> Made a simple registration process.**
 
 ### 1 - New feature = new branch
 
@@ -760,10 +760,90 @@ When your registration process works well, **commit your changes** and **push** 
 You can **merge your feature branch into develop** and **push** develop too !!!
 
 ```sh
-git commit -a -m "Simple login/logout system"
+git commit -a -m "Simple registration process"
 git push origin feature/registration
 git checkout develop
 git merge feature/registration
 git push origin develop
 ```
 
+## Exercise 7
+
+**<u>Final Goal:</u> Don't store the passwords like this use md5**
+
+Store clear text passwords is not a good idea. You have to hash them, for example with the MD5 function.
+
+Update the current passwords of your database with this SQL query (run this only once !!!):
+
+```sql
+UPDATE user SET password = MD5(password);
+```
+
+### 1 - New feature = new branch
+
+You should be on the **develop** branch else enter this line.
+
+```sh
+git checkout develop
+```
+
+Create a new branch **feature/md5** from develop and push it to GitHub.
+
+```sh
+git branch feature/md5
+git checkout feature/md5
+git push origin feature/md5
+```
+
+Now you are ready to code.
+
+### 2 - Repair the login process.
+
+The **login doesn't work** anymore because the passwords are now stored in md5 format and you compare the given password without md5, so you have to modify the **GetUserIdFromUserAndPassword** function into **UserManager.php** to fix it
+
+```php
+function GetUserIdFromUserAndPassword($username, $password)
+{
+  global $PDO;
+  $response = $PDO->prepare("SELECT id FROM user WHERE nickname = :username AND password = MD5(:password) ");
+  $response->bindParam("username", $username, PDO::PARAM_STR);
+  $response->bindParam("password", $password, PDO::PARAM_STR);
+  $response->execute();
+  if ($response->rowCount() == 1) {
+    $row = $response->fetch();
+    return $row['id'];
+  } else {
+    return -1;
+  }
+}
+```
+
+### 3 - Repair the registration process.
+
+The **registration doesn't work as it should**. The passwords have to be stored in md5 format so you have to modify the **CreateNewUser** function into **UserManager.php**
+
+```php
+function CreateNewUser($nickname, $password)
+{
+  global $PDO;
+  $response = $PDO->prepare("INSERT INTO user (nickname, password) values (:nickname , MD5(:password) )");
+  $response->bindParam("nickname", $nickname, PDO::PARAM_STR);
+  $response->bindParam("password", $password, PDO::PARAM_STR);
+  $response->execute();
+  return $PDO->lastInsertId();
+}
+```
+
+### 4 - Save on GitHub
+
+When your registration & login process work well using md5, **commit your changes** and **push** your work to GitHub.
+
+You can **merge your feature branch into develop** and **push** develop too !!!
+
+```sh
+git commit -a -m "Use md5 for the passwords"
+git push origin feature/md5
+git checkout develop
+git merge feature/md5
+git push origin develop
+```
