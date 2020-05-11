@@ -597,7 +597,7 @@ function CreateNewPost($userId, $msg)
 }
 ```
 
-Another example below for the **GetOneCommentFromId** function of the **CommentManager**.
+Another example for the **GetOneCommentFromId** function of the **CommentManager**.
 
 <u>Before</u>:
 
@@ -623,6 +623,43 @@ function GetOneCommentFromId($id)
 }
 ```
 
+Another example for the **SearchInPosts** function of the **PostManager**.
+
+<u>Before</u>:
+
+```php
+function SearchInPosts($search)
+{
+  global $PDO;
+  $response = $PDO->query(
+    "SELECT post.*, user.nickname "
+      . "FROM post LEFT JOIN user on (post.user_id = user.id) "
+      . "WHERE content like '%$search%' "
+      . "ORDER BY post.created_at DESC"
+  );
+  return $response->fetchAll();
+}
+```
+
+<u>After</u>:
+
+```php
+function SearchInPosts($search)
+{
+  global $PDO;
+  $response = $PDO->prepare(
+    "SELECT post.*, user.nickname "
+      . "FROM post LEFT JOIN user on (post.user_id = user.id) "
+      . "WHERE content like :search "
+      . "ORDER BY post.created_at DESC"
+  );
+  $search = "%$search%";
+  $response->bindParam("search", $search, PDO::PARAM_STR);
+  $response->execute();
+  return $response->fetchAll();
+}
+```
+
 ### 3 - Save on GitHub
 
 If all the features are still working, **commit your changes** and **push** your work to GitHub.
@@ -634,6 +671,99 @@ git commit -a -m "Prevent SQL Injection"
 git push origin feature/security
 git checkout develop
 git merge feature/security
+git push origin develop
+```
+
+
+
+## Exercise 6
+
+**<u>Final Goal:</u> Made a simple registration form.**
+
+### 1 - New feature = new branch
+
+You should be on the **develop** branch else enter this line.
+
+```sh
+git checkout develop
+```
+
+Create a new branch **feature/registration** from develop and push it to GitHub.
+
+```sh
+git branch feature/registration
+git checkout feature/registration
+git push origin feature/registration
+```
+
+Now you are ready to code.
+
+### 2 - Modify the source code to be able to register.
+
+1. Modify the file: controllers/**controller.php**
+
+
+```php
+   case 'register':
+    include "../models/UserManager.php";
+    if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['passwordRetype'])) {
+      $errorMsg = NULL;
+      if (!IsNicknameFree($_POST['username'])) {
+        $errorMsg = "Nickname already used.";
+      } else if ($_POST['password'] != $_POST['passwordRetype']) {
+        $errorMsg = "Passwords are not the same.";
+      } else if (strlen(trim($_POST['password'])) < 8) {
+        $errorMsg = "Your password should have at least 8 characters.";
+      } else if (strlen(trim($_POST['username'])) < 4) {
+        $errorMsg = "Your nickame should have at least 4 characters.";
+      }
+      if ($errorMsg) {
+        include "../views/RegisterForm.php";
+      } else {
+        $userId = CreateNewUser($_POST['username'], $_POST['password']);
+        $_SESSION['userId'] = $userId;
+        header('Location: ?action=display');
+      }
+    } else {
+      include "../views/RegisterForm.php";
+    }
+    break;
+```
+
+2. You have to write the **IsNicknameFree** and  **CreateNewUser** functions into **UserManager.php**.
+
+```php
+function IsNicknameFree($nickname)
+{
+  global $PDO;
+  $response = $PDO->prepare("SELECT * FROM user WHERE nickname = :nickname ");
+  $response->bindParam("nickname", $nickname, PDO::PARAM_STR);
+  $response->execute();
+  return $response->rowCount() == 0;
+}
+
+function CreateNewUser($nickname, $password)
+{
+  global $PDO;
+  $response = $PDO->prepare("INSERT INTO user (nickname, password) values (:nickname , :password )");
+  $response->bindParam("nickname", $nickname, PDO::PARAM_STR);
+  $response->bindParam("password", $password, PDO::PARAM_STR);
+  $response->execute();
+  return $PDO->lastInsertId();
+}
+```
+
+### 3 - Save on GitHub
+
+When your registration process works well, **commit your changes** and **push** your work to GitHub.
+
+You can **merge your feature branch into develop** and **push** develop too !!!
+
+```sh
+git commit -a -m "Simple login/logout system"
+git push origin feature/registration
+git checkout develop
+git merge feature/registration
 git push origin develop
 ```
 
