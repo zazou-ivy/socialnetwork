@@ -8,6 +8,10 @@ switch ($action) {
     // code...
     break;
 
+  case 'logout':
+    // code...
+    break;
+
   case 'login':
     // code...
     break;

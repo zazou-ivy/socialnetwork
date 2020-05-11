@@ -148,6 +148,8 @@ sudo systemctl start apache2
 
   http://localhost/socialnetwork/web/
 
+
+
 ## Exercise 1
 
 The posts are dynamically retrieved from the database, nonetheless, the comments are hardcoded.
@@ -243,6 +245,7 @@ git push origin develop
 ```
 
 
+
 ## Exercise 2
 
 **<u>Final Goal:</u> Made a simple search feature.**
@@ -309,9 +312,9 @@ default:
     include "../models/CommentManager.php";
 ```
 
-2. You have to write the **SearchInPosts** function into models/**PostManager.php**
+2. You have to write the **SearchInPosts** function into models/**PostManager.php**. 
 
-  To do that copy/paste the **GetAllPosts** function, rename it into **SearchInPosts**.
+   To do that copy/paste the **GetAllPosts** function, rename it into **SearchInPosts**.
 
 3. Add the argument **$search** to this function.
 
@@ -337,3 +340,115 @@ git checkout develop
 git merge feature/search
 git push origin develop
 ```
+
+
+
+## Exercise 3
+
+**<u>Final Goal:</u> Made a simple login & logout feature.**
+
+### 1 - New feature = new branch
+
+You should be on the **develop** branch else enter this line.
+
+```sh
+git checkout develop
+```
+
+Create a new branch **feature/login** from develop and push it to GitHub.
+
+```sh
+git branch feature/login
+git checkout feature/login
+git push origin feature/login
+```
+
+Now you are ready to code.
+
+### 2 - Modify the navbar to display a logout when it needs
+
+When the user will be logged, **$_SESSION['userId']** will contain his user id.
+
+Modify the file: views/**DisplayPosts.php**
+
+The navbar-nav section depends if the variable **$_SESSION['userId']** is set or not.
+
+```php+HTML
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <form class="nav-link" method="get">
+            <input name="search" type="text"></input>
+          </form>
+        </li>
+    <?php
+      if (isset($_SESSION['userId'])) {
+    ?>
+        <li class="nav-item">
+          <a class="nav-link" href="?action=logout" role="button">Logout</a>
+        </li>
+    <?php
+      } else {
+    ?>
+        <li class="nav-item">
+          <a class="nav-link" href="?action=login" role="button">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="?action=register" role="button">Sign Up</a>
+        </li>
+    <?php
+      }
+    ?>
+      </ul>
+```
+
+### 3 - Modify the source code to be able to login & logout.
+
+1. Modify the file: controllers/**controller.php**
+
+   The **logout** action unset the variable **$_SESSION['userId']** and redirect the visitor to the default action.
+
+   The **login** action verify the username & password and set the variable **$_SESSION['userId']** and redirect the visitor to the default action.
+
+   If the <u>credentials are wrongs or not present in $_POST it displays the login form</u>.
+
+```php
+  case 'logout':
+    if (isset($_SESSION['userId'])) {
+      unset($_SESSION['userId']);
+    }
+    header('Location: ?action=display');
+    break;
+
+  case 'login':
+    include "../models/UserManager.php";
+    if (isset($_POST['username']) && isset($_POST['password'])) {
+      $userId = GetUserIdFromUserAndPassword($_POST['username'], $_POST['password']);
+      if ($userId > 0) {
+        $_SESSION['userId'] = $userId;
+        header('Location: ?action=display');
+      } else {
+        $errorMsg = "Wrong login and/or password.";
+        include "../views/LoginForm.php";
+      }
+    } else {
+      include "../views/LoginForm.php";
+    }
+    break;
+```
+
+2. You have to write the **GetUserIdFromUserAndPassword** function into models/**UserManager.php**. This function have to return the user id if the user well exists and his password is the same. Else this function has to return -1.
+
+### 4 - Save on GitHub
+
+When your login/logout works well, **commit your changes** and **push** your work to GitHub.
+
+You can **merge your feature branch into develop** and **push** develop too !!!
+
+```sh
+git commit -a -m "Simple login/logout system"
+git push origin feature/login
+git checkout develop
+git merge feature/login
+git push origin develop
+```
+
