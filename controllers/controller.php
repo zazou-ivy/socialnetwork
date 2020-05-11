@@ -16,6 +16,10 @@ switch ($action) {
     // code...
     break;
 
+  case 'newMsg':
+    // code...
+    break;
+
   case 'display':
   default:
     include "../models/PostManager.php";

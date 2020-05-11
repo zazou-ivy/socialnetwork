@@ -452,3 +452,91 @@ git merge feature/login
 git push origin develop
 ```
 
+
+
+## Exercise 4
+
+**<u>Final Goal:</u> Be able to post a new message on the tiny social network.**
+
+### 1 - New feature = new branch
+
+You should be on the **develop** branch else enter this line.
+
+```sh
+git checkout develop
+```
+
+Create a new branch **feature/login** from develop and push it to GitHub.
+
+```sh
+git branch feature/newmsg
+git checkout feature/newmsg
+git push origin feature/newmsg
+```
+
+Now you are ready to code.
+
+### 2 - Modify the main page to display a form to post a message
+
+![screenshot_newMsg](screenshot_newMsg.png)
+
+Modify the file: views/**DisplayPosts.php**
+
+When the user is logged (when the variable **$_SESSION['userId']** is set) display the form.
+
+```php+HTML
+<?php
+if (isset($_SESSION['userId'])) {
+?>
+  <div class="row newMsg">
+    <div class="col">
+      <form class="input-group" method="POST" action="?action=newMsg">
+        <input name="msg" class="form-control" placeholder="Add a message" type="text">
+        <button type="submit" class="btn btn-primary">Submit</button>    
+      </form>
+    </div>
+  </div>
+<?php
+}
+?>
+```
+
+### 3 - Modify the source code to create a new post.
+
+1. Modify the file: controllers/**controller.php**
+
+   If the user is logged and want to post a new message (value read from **$_POST['msg']**) so we will create a **new insert** into the **Post** table with the function **CreateNewPost**.
+
+
+```php
+  case 'newMsg':
+    include "../models/PostManager.php";
+    if (isset($_SESSION['userId']) && isset($_POST['msg'])) {
+      CreateNewPost($_SESSION['userId'], $_POST['msg']);
+    }
+    header('Location: ?action=display');
+    break;
+```
+
+2. You have to write the **CreateNewPost** function into models/**PostManager.php**. 
+
+   This function takes 2 arguments **$userId** and **$msg**. 
+   It has to execute this query: 
+
+```php
+"INSERT INTO post(user_id, content) values ($userId, '$msg')"
+```
+
+### 4 - Save on GitHub
+
+When you are to able to post a new message, **commit your changes** and **push** your work to GitHub.
+
+You can **merge your feature branch into develop** and **push** develop too !!!
+
+```sh
+git commit -a -m "Simple post system"
+git push origin feature/newmsg
+git checkout develop
+git merge feature/newmsg
+git push origin develop
+```
