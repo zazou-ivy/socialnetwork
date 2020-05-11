@@ -1,6 +1,6 @@
 <?php
-$db_user = "equesada";
-$db_passwd = "equesada";
+$db_user = "dbuser";
+$db_passwd = "1234Soleil!";
 $db_host = "localhost";
 $db_port = "3306";
 $db_name = "tsn";

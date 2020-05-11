@@ -7,7 +7,7 @@ It's a *tiny social network* where **USER**s can **POST** messages and **COMMENT
 ### Goal
 
 This project was done for my PHP courses.
-The goal is to discover the **PHP syntax** and use **PDO** (PHP Data Objects)  for accessing databases.
+The goal is to review the **PHP syntax** and use **PDO** (PHP Data Objects)  for accessing databases.
 
 
 
@@ -234,10 +234,106 @@ When all is ok, **commit your changes** and **push** your work to GitHub.
 
 You can **merge your feature branch into develop** and **push** develop too !!!
 
-   ```sh
+```sh
 git commit -a -m "Remove the hardcoded comments"
 git push origin feature/retrieveComments
 git checkout develop
 git merge feature/retrieveComments
 git push origin develop
-   ```
+```
+
+
+## Exercise 2
+
+**<u>Final Goal:</u> Made a simple search feature.**
+
+### 1 - New feature = new branch
+
+You should be on the **develop** branch else enter this line.
+
+```sh
+git checkout develop
+```
+
+Create a new branch **feature/search** from develop and push it to GitHub.
+
+```sh
+git branch feature/search
+git checkout feature/search
+git push origin feature/search
+```
+
+Now you are ready to code.
+
+### 2 - Add the search form into the navbar.
+
+Modify the file: views/**DisplayPosts.php**
+
+Before the "Login" and "Sign Up" links, add the **search form** like this:
+
+![screenshot_search](screenshot_search.png)
+
+```html
+<ul class="navbar-nav">
+    <li class="nav-item">
+        <form class="nav-link" method="get">
+            <input name="search" type="text"></input>
+        </form>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="?action=login" role="button">Login</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="?action=register" role="button">Sign Up</a>
+    </li>
+</ul>
+```
+
+### 3 - Modify the source code to search
+
+1. Modify the file: controllers/**controller.php**
+
+   If the **search** parameter is well defined into **$_GET** we will use it to retrieve the right posts.
+
+   Else the posts will continue to come from the **GetAllPosts** function.
+
+```php
+default:
+    include "../models/PostManager.php";
+    if (isset($_GET['search'])) {
+      $posts = SearchInPosts($_GET['search']);
+    } else {
+      $posts = GetAllPosts();
+    }
+    
+    include "../models/CommentManager.php";
+```
+
+2. You have to write the **SearchInPosts** function into models/**PostManager.php**
+
+  To do that copy/paste the **GetAllPosts** function, rename it into **SearchInPosts**.
+
+3. Add the argument **$search** to this function.
+
+4. Add a *where* clause into the sql query using this argument, it should look like this:
+
+```php
+ "SELECT post.*, user.nickname "
+      . "FROM post LEFT JOIN user on (post.user_id = user.id) "
+      . "WHERE content like '%$search%' "
+      . "ORDER BY post.created_at DESC"
+```
+
+### 4 - Save on GitHub
+
+When your search works well, **commit your changes** and **push** your work to GitHub.
+
+You can **merge your feature branch into develop** and **push** develop too !!!
+
+```sh
+git commit -a -m "Simple search using the sql like"
+git push origin feature/search
+git checkout develop
+git merge feature/search
+git push origin develop
+```
