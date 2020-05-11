@@ -63,13 +63,13 @@
                 </div>
                 <div class="pull-left meta">
                   <div class="title h5">
-                    <a href="#"><b><?= $onePost['nickname']; ?></b></a>
+                    <a href="#"><b><?= htmlspecialchars($onePost['nickname']); ?></b></a>
                   </div>
                   <h6 class="text-muted time"><?= $onePost['created_at']; ?></h6>
                 </div>
               </div>
               <div class="post-description">
-                <p><?= $onePost['content']; ?></p>
+                <p><?= htmlspecialchars($onePost['content']); ?></p>
               </div>
               <div class="post-footer">
                 <div class="input-group">
@@ -90,10 +90,10 @@
                         </a>
                         <div class="comment-body">
                           <div class="comment-heading">
-                            <h4 class="user"><?= $comment['nickname']; ?></h4>
+                            <h4 class="user"><?= htmlspecialchars($comment['nickname']); ?></h4>
                             <h5 class="time"><?= $comment['created_at']; ?></h5>
                           </div>
-                          <p><?= $comment['content']; ?></p>
+                          <p><?= htmlspecialchars($comment['content']); ?></p>
                         </div>
                       </li>
                   <?php
