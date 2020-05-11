@@ -436,7 +436,7 @@ The navbar-nav section depends if the variable **$_SESSION['userId']** is set or
     break;
 ```
 
-2. You have to write the **GetUserIdFromUserAndPassword** function into models/**UserManager.php**. This function have to return the user id if the user well exists and his password is the same. Else this function has to return -1.
+2. You have to write the **GetUserIdFromUserAndPassword** function into models/**UserManager.php**. This function takes 2 arguments **$username** and **$password** and it has to **return the user id** (if the user well exists and his password is the same) else this function has to return -1.
 
 ### 4 - Save on GitHub
 
@@ -466,7 +466,7 @@ You should be on the **develop** branch else enter this line.
 git checkout develop
 ```
 
-Create a new branch **feature/login** from develop and push it to GitHub.
+Create a new branch **feature/newmsg** from develop and push it to GitHub.
 
 ```sh
 git branch feature/newmsg
@@ -540,3 +540,100 @@ git checkout develop
 git merge feature/newmsg
 git push origin develop
 ```
+
+
+
+## Exercise 5
+
+**<u>Final Goal:</u> Prevent for sql injections.**
+
+### 1 - New feature = new branch
+
+You should be on the **develop** branch else enter this line.
+
+```sh
+git checkout develop
+```
+
+Create a new branch **feature/security** from develop and push it to GitHub.
+
+```sh
+git branch feature/security
+git checkout feature/security
+git push origin feature/security
+```
+
+Now you are ready to code.
+
+### 2 - Modify the managers to use prepared queries
+
+The current version can be hacked when posting a new message because the input of the user is directly put inside the sql query. You have to use [prepared statements/queries](https://www.php.net/manual/en/pdo.prepare.php) to prevent sql injections.
+
+**TODO**
+Replace in the 3 managers (**CommentManager**, **UserManager**, **PostManager**) the sql queries that use input data by **prepared queries**.
+
+See the example below for the **CreateNewPost** function of the **PostManager**.
+
+<u>Before</u>:
+
+```php
+function CreateNewPost($userId, $msg)
+{
+  global $PDO;
+  $response = $PDO->exec("INSERT INTO post(user_id, content) values ($userId, '$msg')");
+}
+```
+
+<u>After</u>:
+
+```php
+function CreateNewPost($userId, $msg)
+{
+  global $PDO;
+  $response = $PDO->prepare("INSERT INTO post(user_id, content) values (:userId, :msg)");
+  $response->bindParam("userId", $userId, PDO::PARAM_INT);
+  $response->bindParam("msg", $msg, PDO::PARAM_STR);
+  $response->execute();
+}
+```
+
+Another example below for the **GetOneCommentFromId** function of the **CommentManager**.
+
+<u>Before</u>:
+
+```php
+function GetOneCommentFromId($id)
+{
+  global $PDO;
+  $response = $PDO->query("SELECT * FROM comment WHERE id = " . $id);
+  return $response->fetch();
+}
+```
+
+<u>After</u>:
+
+```php
+function GetOneCommentFromId($id)
+{
+  global $PDO;
+  $response = $PDO->prepare("SELECT * FROM comment WHERE id = :id ");
+  $response->bindParam("id", $id, PDO::PARAM_INT);
+  $response->execute();
+  return $response->fetch();
+}
+```
+
+### 3 - Save on GitHub
+
+If all the features are still working, **commit your changes** and **push** your work to GitHub.
+
+You can **merge your feature branch into develop** and **push** develop too !!!
+
+```sh
+git commit -a -m "Prevent SQL Injection"
+git push origin feature/security
+git checkout develop
+git merge feature/security
+git push origin develop
+```
+
