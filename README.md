@@ -43,7 +43,7 @@ It's a simple **MVC** implementation **without OOP** (Object-Oriented Programmin
 |       RegisterForm.php
 |       
 \---web/
-    |   index.php
+    |   index.php      <----- entry point
     |   
     +---css/
     +---img/       
@@ -870,3 +870,94 @@ git checkout develop
 git merge feature/md5
 git push origin develop
 ```
+
+
+
+## Exercise 8
+
+**<u>Final Goal:</u> Be able to post a new comment on any post.**
+
+### 1 - New feature = new branch
+
+You should be on the **develop** branch else enter this line.
+
+```sh
+git checkout develop
+```
+
+Create a new branch **feature/newcomment** from develop and push it to GitHub.
+
+```sh
+git branch feature/newcomment
+git checkout feature/newcomment
+git push origin feature/newcomment
+```
+
+Now you are ready to code.
+
+### 2 - Modify the main page to display a form to post a comment
+
+![screenshot_newComment](screenshot_newComment.png)
+
+Modify the file: views/**DisplayPosts.php**
+
+When the user is logged (when the variable **$_SESSION['userId']** is set) display the form to comment.
+
+```php+HTML
+<?php
+if (isset($_SESSION['userId'])) {
+?>
+  <div class="input-group">
+    <form class="input-group" method="POST" action="?action=newComment">
+      <input name="postId" type="hidden" value="<?= $onePost['id'] ?>">
+      <input name="comment" class="form-control" placeholder="Add a comment" type="text">
+      <span class="input-group-text">
+        <a href="#" onclick="$(this).closest('form').submit()"><i class="fa fa-edit"></i></a>
+      </span>
+    </form>
+  </div>
+<?php
+}
+?>
+```
+
+### 3 - Modify the source code to create a new comment.
+
+1. Modify the file: controllers/**controller.php**
+
+   If the user is logged and want to post a new message (value read from **$_POST['msg']**) so we will create a **new insert** into the **Post** table with the function **CreateNewPost**.
+
+
+```php
+  case 'newComment':
+    include "../models/CommentManager.php";
+    if (isset($_SESSION['userId']) && isset($_POST['postId']) && isset($_POST['comment'])) {
+      CreateNewComment($_SESSION['userId'], $_POST['postId'], $_POST['comment']);
+    }
+    header('Location: ?action=display');
+    break;
+```
+
+2. You have to write the **CreateNewComment** function into models/**CommentManager.php**. 
+
+   This function takes 3 arguments **$userId**, **$postId** and **$comment**. 
+   It has to execute this query: 
+
+```php
+"INSERT INTO comment(user_id, post_id, content) values (:userId, :postId, :comment)"
+```
+
+### 4 - Save on GitHub
+
+When you are to able to post a new comment, **commit your changes** and **push** your work to GitHub.
+
+You can **merge your feature branch into develop** and **push** develop too !!!
+
+```sh
+git commit -a -m "Simple comment system"
+git push origin feature/newcomment
+git checkout develop
+git merge feature/newcomment
+git push origin develop
+```
+
