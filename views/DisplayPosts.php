@@ -72,12 +72,6 @@
                 <p><?= htmlspecialchars($onePost['content']); ?></p>
               </div>
               <div class="post-footer">
-                <div class="input-group">
-                  <input class="form-control" placeholder="Add a comment" type="text">
-                  <span class="input-group-text">
-                    <a href="#"><i class="fa fa-edit"></i></a>
-                  </span>
-                </div>
                 <ul class="comments-list">
                   <?php
                   $postId = $onePost['id'];

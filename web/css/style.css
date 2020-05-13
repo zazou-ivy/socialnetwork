@@ -73,6 +73,10 @@
   margin-right: 8px;
 }
 
+.post-footer {
+  background-color: #f8f9fa;
+}
+
 .post .post-footer {
   border-top: 1px solid #ddd;
   padding: 15px;
