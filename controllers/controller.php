@@ -1,6 +1,6 @@
 <?php
 
-$action = isset($_GET["action"]) ? $_GET["action"] : null;
+$action = $_GET["action"] ?? "display";
 
 switch ($action) {
 

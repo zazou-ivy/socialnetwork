@@ -4,7 +4,7 @@ include_once "PDO.php";
 function GetOnePostFromId($id)
 {
   global $PDO;
-  $response = $PDO->query("SELECT * FROM post WHERE id = " . $id);
+  $response = $PDO->query("SELECT * FROM post WHERE id = $id");
   return $response->fetch();
 }
 
@@ -22,6 +22,6 @@ function GetAllPosts()
 function GetAllPostsFromUserId($userId)
 {
   global $PDO;
-  $response = $PDO->query("SELECT * FROM post WHERE user_id = " . $userId . " ORDER BY created_at DESC");
+  $response = $PDO->query("SELECT * FROM post WHERE user_id = $userId ORDER BY created_at DESC");
   return $response->fetchAll();
 }

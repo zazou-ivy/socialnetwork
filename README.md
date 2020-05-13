@@ -39,6 +39,8 @@ It's a simple **MVC** implementation **without OOP** (Object-Oriented Programmin
 |       
 +---views/
 |       DisplayPosts.php
+|       LoginForm.php
+|       RegisterForm.php
 |       
 \---web/
     |   index.php
@@ -591,9 +593,12 @@ function CreateNewPost($userId, $msg)
 {
   global $PDO;
   $response = $PDO->prepare("INSERT INTO post(user_id, content) values (:userId, :msg)");
-  $response->bindParam("userId", $userId, PDO::PARAM_INT);
-  $response->bindParam("msg", $msg, PDO::PARAM_STR);
-  $response->execute();
+  $response->execute(
+    array(
+      "userId" => $userId,
+      "msg" => $msg
+    )
+  );
 }
 ```
 
@@ -617,8 +622,11 @@ function GetOneCommentFromId($id)
 {
   global $PDO;
   $response = $PDO->prepare("SELECT * FROM comment WHERE id = :id ");
-  $response->bindParam("id", $id, PDO::PARAM_INT);
-  $response->execute();
+  $response->execute(
+    array(
+      "id" => $id
+    )
+  );
   return $response->fetch();
 }
 ```
@@ -654,8 +662,11 @@ function SearchInPosts($search)
       . "ORDER BY post.created_at DESC"
   );
   $search = "%$search%";
-  $response->bindParam("search", $search, PDO::PARAM_STR);
-  $response->execute();
+  $response->execute(
+    array(
+      "search" => $search
+    )
+  );
   return $response->fetchAll();
 }
 ```
@@ -737,8 +748,11 @@ function IsNicknameFree($nickname)
 {
   global $PDO;
   $response = $PDO->prepare("SELECT * FROM user WHERE nickname = :nickname ");
-  $response->bindParam("nickname", $nickname, PDO::PARAM_STR);
-  $response->execute();
+  $response->execute(
+    array(
+      "nickname" => $nickname
+    )
+  );
   return $response->rowCount() == 0;
 }
 
@@ -746,9 +760,12 @@ function CreateNewUser($nickname, $password)
 {
   global $PDO;
   $response = $PDO->prepare("INSERT INTO user (nickname, password) values (:nickname , :password )");
-  $response->bindParam("nickname", $nickname, PDO::PARAM_STR);
-  $response->bindParam("password", $password, PDO::PARAM_STR);
-  $response->execute();
+  $response->execute(
+    array(
+      "nickname" => $nickname,
+      "password" => $password
+    )
+  );
   return $PDO->lastInsertId();
 }
 ```
@@ -806,9 +823,12 @@ function GetUserIdFromUserAndPassword($username, $password)
 {
   global $PDO;
   $response = $PDO->prepare("SELECT id FROM user WHERE nickname = :username AND password = MD5(:password) ");
-  $response->bindParam("username", $username, PDO::PARAM_STR);
-  $response->bindParam("password", $password, PDO::PARAM_STR);
-  $response->execute();
+  $response->execute(
+    array(
+      "username" => $username,
+      "password" => $password
+    )
+  );
   if ($response->rowCount() == 1) {
     $row = $response->fetch();
     return $row['id'];
@@ -827,9 +847,12 @@ function CreateNewUser($nickname, $password)
 {
   global $PDO;
   $response = $PDO->prepare("INSERT INTO user (nickname, password) values (:nickname , MD5(:password) )");
-  $response->bindParam("nickname", $nickname, PDO::PARAM_STR);
-  $response->bindParam("password", $password, PDO::PARAM_STR);
-  $response->execute();
+  $response->execute(
+    array(
+      "nickname" => $nickname,
+      "password" => $password
+    )
+  );
   return $PDO->lastInsertId();
 }
 ```
