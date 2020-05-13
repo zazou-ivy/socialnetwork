@@ -20,6 +20,10 @@ switch ($action) {
     // code...
     break;
 
+  case 'newComment':
+    // code...
+    break;
+
   case 'display':
   default:
     include "../models/PostManager.php";
