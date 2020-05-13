@@ -1,5 +1,7 @@
 # Tiny Social Network
 
+*Read this in other languages: [English](README.md), [Français](README.fr.md)*
+
 ## Welcome
 
 It's a *tiny social network* where **USER**s can **POST** messages and **COMMENT** these messages.
@@ -58,7 +60,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 You need to have a **L.A.M.P.** architecture working on your computer.
 
-Else you need to install the missing parts.
+Else you need to install the missing parts (instructions for Ubuntu below).
 
 **MySQL server**:
 
@@ -88,6 +90,8 @@ EXIT;
 
 **Apache2 server**:
 
+Installation
+
 ```sh
 sudo apt-get install apache2
 ```
@@ -97,6 +101,23 @@ Start the server:
 ```sh
 sudo systemctl start apache2
 ```
+
+**PHP & PDO**:
+
+Installation
+
+```sh
+sudo apt update
+sudo apt install php php-cli php-mysql
+```
+
+Restart apache2:
+
+```sh
+sudo systemctl restart apache2
+```
+
+
 
 ### Installing
 
@@ -160,14 +181,15 @@ The posts are dynamically retrieved from the database, nonetheless, the comments
 
 ### 1 - Show me the code
 
-Have a look inside the project to **understand each line of code**.
+Have a look inside the project to **understand approximately each line of code**.
 Start with the entry point, the *index.php* inside the **web directory**.
 And follow the execution to understand the whole project.
 
 ```php
 <?php
-  include "../controllers/controller.php";
-?>
+session_start();
+
+include "../controllers/controller.php";
 ```
 
 ### 2 - Use Git in the right way
@@ -218,7 +240,12 @@ case 'display':
 ```
 <u>You have to:</u>
 
-1.  Go into *models/**CommentManager.php*** to create a new function **GetAllCommentsFromPostId**. This new function should return **all comments** from a **post id**. <u>Don't forget you need the nickname of the user who commented</u>. To do that, have a look to the **GetAllCommentsFromUserId**. Your new function do almost the same thing but instead of "WHERE comment.**user_id = $userId** " you should have "WHERE comment.**post_id = $postId** ".
+1.  Go into *models/**CommentManager.php*** to create a new function **GetAllCommentsFromPostId**.
+    This new function should return **all comments** from a **post id**.
+    <u>Don't forget you need the nickname of the user who commented</u>.
+    To do that, have a look to the **GetAllCommentsFromUserId**. 
+    Your new function do almost the same thing but instead of 
+    "WHERE comment.**user_id = $userId** " you should have "WHERE comment.**post_id = $postId** ".
 
 ```php
    function GetAllCommentsFromPostId($postId) {
@@ -230,7 +257,10 @@ case 'display':
 
 3. Instead, loop over **$posts** and call your new function **GetAllCommentsFromPostId** <u>for each post</u> giving the **post id**.
 
-4. Inside the loop, fill the **$comments** array with the results. **$comments** is an associative array, the "key" should be the **post id** and the "value" the result of your new function **GetAllCommentsFromPostId**.
+4. Inside the loop, we need to fill the **$comments** array.
+   **$comments** is an associative array.
+   The "key" should be the **post id**.
+   The "value" is the result of your function **GetAllCommentsFromPostId**.
 
 ### 4 - Save on GitHub
 
@@ -294,7 +324,7 @@ Before the "Login" and "Sign Up" links, add the **search form** like this:
 </ul>
 ```
 
-### 3 - Modify the source code to search
+### 3 - Modify the source code to add the search feature
 
 1. Modify the file: controllers/**controller.php**
 
@@ -303,6 +333,7 @@ Before the "Login" and "Sign Up" links, add the **search form** like this:
    Else the posts will continue to come from the **GetAllPosts** function.
 
 ```php
+case 'display':
 default:
     include "../models/PostManager.php";
     if (isset($_GET['search'])) {
@@ -373,7 +404,7 @@ When the user will be logged, **$_SESSION['userId']** will contain his user id.
 
 Modify the file: views/**DisplayPosts.php**
 
-The navbar-nav section depends if the variable **$_SESSION['userId']** is set or not.
+The content of the navbar-nav section depends if the variable **$_SESSION['userId']** is set or not.
 
 ```php+HTML
       <ul class="navbar-nav">
@@ -407,11 +438,13 @@ The navbar-nav section depends if the variable **$_SESSION['userId']** is set or
 
 1. Modify the file: controllers/**controller.php**
 
-   The **logout** action unset the variable **$_SESSION['userId']** and redirect the visitor to the default action.
+   The **logout** action unset the variable **$_SESSION['userId']** and redirect the visitor to the display action.
 
-   The **login** action verify the username & password and set the variable **$_SESSION['userId']** and redirect the visitor to the default action.
+   The **login** action try to get the user id from his username & password.
 
-   If the <u>credentials are wrongs or not present in $_POST it displays the login form</u>.
+   If it **succeed**, it sets the user id into the **$_SESSION['userId']** and **redirect the visitor to the display** action.
+   
+   If it **failed**, it set an **error message** and **display the login form again**.
 
 ```php
   case 'logout':
@@ -507,7 +540,7 @@ if (isset($_SESSION['userId'])) {
 
 1. Modify the file: controllers/**controller.php**
 
-   If the user is logged and want to post a new message (value read from **$_POST['msg']**) so we will create a **new insert** into the **Post** table with the function **CreateNewPost**.
+   If the user is logged and want to post a new message (value read from **$_POST['msg']**) so we will create an **insert** into the **post** table with the function **CreateNewPost**.
 
 
 ```php
@@ -661,10 +694,10 @@ function SearchInPosts($search)
       . "WHERE content like :search "
       . "ORDER BY post.created_at DESC"
   );
-  $search = "%$search%";
+  $searchWithPercent = "%$search%";
   $response->execute(
     array(
-      "search" => $search
+      "search" => $searchWithPercent
     )
   );
   return $response->fetchAll();
@@ -784,11 +817,14 @@ git merge feature/registration
 git push origin develop
 ```
 
+
+
 ## Exercise 7
 
 **<u>Final Goal:</u> Don't store the passwords like this use md5**
 
-Store clear text passwords is not a good idea. You have to hash them, for example with the MD5 function.
+Store clear text passwords is not a good idea. 
+[You have to hash them, for example with the MD5 function.](https://en.wikipedia.org/wiki/MD5)
 
 Update the current passwords of your database with this SQL query (run this only once !!!):
 
@@ -816,7 +852,7 @@ Now you are ready to code.
 
 ### 2 - Repair the login process.
 
-The **login doesn't work** anymore because the passwords are now stored in md5 format and you compare the given password without md5, so you have to modify the **GetUserIdFromUserAndPassword** function into **UserManager.php** to fix it
+The **login doesn't work** anymore because the passwords are now stored in md5 format and we compare the given password without md5, so you have to modify the **GetUserIdFromUserAndPassword** function into **UserManager.php** to fix it
 
 ```php
 function GetUserIdFromUserAndPassword($username, $password)
@@ -925,7 +961,7 @@ if (isset($_SESSION['userId'])) {
 
 1. Modify the file: controllers/**controller.php**
 
-   If the user is logged and want to post a new message (value read from **$_POST['msg']**) so we will create a **new insert** into the **Post** table with the function **CreateNewPost**.
+   If the user is logged and want to post a new message (values read from **$_POST['msg']** & **$_POST['postId']**) so we will create an **insert** into the **post** table with the function **CreateNewPost**.
 
 
 ```php
